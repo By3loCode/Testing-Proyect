@@ -1,0 +1,15 @@
+﻿{
+  "name": "sistema-corporativo-seguridad",
+  "version": "1.0.0",
+  "description": "Sistema Corporativo de Seguridad - 11 pisos, 2,200 usuarios, 17 discos",
+  "scripts": {
+    "dev": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "start": "cd frontend && npm start",
+    "monitor:disks": "python scripts/monitoring/disk_monitor.py",
+    "lint": "cd frontend && npm run lint"
+  },
+  "keywords": ["security", "monitoring", "dashboard"],
+  "author": "Henry Rodríguez",
+  "license": "MIT"
+}

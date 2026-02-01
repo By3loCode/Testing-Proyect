@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Shield, Zap, Lock, User, CheckCircle, AlertCircle, ChevronRight } from 'lucide-react';
 
 // ====================================================================
-// NEON CHECKBOX COMPONENT
+// NEON CHECKBOX
 // ====================================================================
 const NeonCheckbox = ({ checked, onChange }) => (
   <label className="neon-checkbox">
@@ -39,7 +40,7 @@ const NeonCheckbox = ({ checked, onChange }) => (
 );
 
 // ====================================================================
-// SPLASH SCREEN - CORPOELEC INDUSTRIAL (Nuevo)
+// SPLASH SCREEN - CORPOEELEC INDUSTRIAL
 // ====================================================================
 const SplashScreen = ({ onComplete }) => {
   const [progress, setProgress] = useState(0);
@@ -165,7 +166,6 @@ const SplashScreen = ({ onComplete }) => {
             <span>{progress}%</span>
           </div>
           <div className="progress-bar">
-            {/* RED REFACTOR: Changed from progress-fill (green) to red style inline or class */}
             <div className="progress-fill bg-red-600" style={{ width: `${progress}%`, boxShadow: '0 0 10px #ef4444' }}></div>
           </div>
         </div>
@@ -194,9 +194,9 @@ const SplashScreen = ({ onComplete }) => {
   );
 };
 
-// ====================================================================
+// ========================
 // LOGIN
-// ====================================================================
+// ========================
 const usePasswordToggle = () => {
   const [visible, setVisible] = useState(false);
   const toggle = useCallback(() => setVisible(v => !v), []);
@@ -216,7 +216,6 @@ const PasswordStrength = ({ password }) => {
 
   const strength = getStrength();
   const labels = ['Muy débil', 'Débil', 'Regular', 'Fuerte', 'Excelente'];
-  // RED REFACTOR: Colors adapted to red/orange scale
   const colors = ['bg-red-800', 'bg-red-600', 'bg-orange-500', 'bg-orange-400', 'bg-red-500'];
 
   if (!password) return null;
@@ -364,6 +363,20 @@ const LoginCorpoelecForm = () => {
   const [loginSuccess, setLoginSuccess] = useState(false);
   const formRef = useRef(null);
 
+  // ✅ MOVIDO AL INICIO: useRouter antes de cualquier condicional
+  const router = useRouter();
+
+  // ✅ MOVIDO FUERA DEL CONDICIONAL: useEffect para redirección
+  useEffect(() => {
+    if (loginSuccess) {
+      const timer = setTimeout(() => {
+        router.push('/dashboard');
+      }, 2000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [loginSuccess, router]);
+
   const { type: passwordType, icon: passwordIcon, toggle: togglePassword } = usePasswordToggle();
 
   useEffect(() => {
@@ -419,6 +432,7 @@ const LoginCorpoelecForm = () => {
     }
   };
 
+  // ✅ CONDICIÓN DE RENDERIZADO después del useEffect
   if (loginSuccess) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 relative bg-gradient-to-br from-gray-900 via-black to-gray-900">

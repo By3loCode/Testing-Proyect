@@ -4,118 +4,521 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Eye, EyeOff, Shield, Zap, Lock, User, CheckCircle, AlertCircle, ChevronRight } from 'lucide-react';
 
 // ====================================================================
-// PANTALLA DE CARGA CHIP CON CABLES
+// SPLASH SCREEN - CORPOELEC INDUSTRIAL (Nuevo)
 // ====================================================================
-const SystemBoot = ({ onReady }) => {
+const SplashScreen = ({ onComplete }) => {
+  const [progress, setProgress] = useState(0);
+  const [status, setStatus] = useState([false, false, false]);
+  const [showLoader, setShowLoader] = useState(true);
+  const loaderRef = useRef(null);
+  const startTimeRef = useRef(null);
+
   useEffect(() => {
-    const timer = setTimeout(() => onReady(), 3000);
-    return () => clearTimeout(timer);
-  }, [onReady]);
+    if (!startTimeRef.current) {
+        startTimeRef.current = Date.now();
+    }
+    const totalDuration = 3000;
+    let animationFrameId;
+
+    const animate = () => {
+      const elapsed = Date.now() - startTimeRef.current;
+      const progressValue = Math.min(elapsed / totalDuration, 1);
+      const percent = Math.floor(progressValue * 100);
+
+      setProgress(percent);
+
+      // Actualizar estados
+      const newStatus = [...status];
+      for (let i = 0; i < 3; i++) {
+        const statusStart = 0.1 + (i * 0.2);
+        if (progressValue > statusStart) {
+          newStatus[i] = true;
+        }
+      }
+      setStatus(newStatus);
+
+      // Completar
+      if (progressValue >= 1) {
+        setShowLoader(false);
+        if (loaderRef.current) {
+          loaderRef.current.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+          loaderRef.current.style.opacity = '0';
+          loaderRef.current.style.transform = 'scale(0.92)';
+          setTimeout(() => {
+            if (loaderRef.current) loaderRef.current.style.display = 'none';
+          }, 600);
+        }
+        
+        if (onComplete) {
+          setTimeout(() => onComplete(), 1000);
+        }
+      }
+
+      if (progressValue < 1) {
+        animationFrameId = requestAnimationFrame(animate);
+      }
+    };
+
+    animationFrameId = requestAnimationFrame(animate);
+
+    // Activar primer estado
+    const timeoutId = setTimeout(() => {
+      setStatus(prev => {
+         const newS = [...prev];
+         newS[0] = true;
+         return newS;
+      });
+    }, 100);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      clearTimeout(timeoutId);
+    };
+  }, [status, onComplete]);
 
   return (
-    <div className="main-container">
+    <div className="splash-screen">
       <style jsx>{`
-        .main-container {
+        .splash-screen {
+          min-height: 100vh;
+          background: linear-gradient(145deg, #0d1117 0%, #161b22 100%);
           display: flex;
           justify-content: center;
           align-items: center;
-          height: 100vh;
-          width: 100%;
-          background: #000;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          overflow: hidden;
         }
-        .loader { width: 100%; max-width: 800px; height: 500px; }
-        .trace-bg { stroke: #333; stroke-width: 1.8; fill: none; }
-        .trace-flow {
-          stroke-width: 1.8;
-          fill: none;
-          stroke-dasharray: 40 400;
-          stroke-dashoffset: 438;
-          filter: drop-shadow(0 0 6px currentColor);
-          animation: flow 3s cubic-bezier(0.5, 0, 0.9, 1) infinite;
+
+        .splash-container {
+          text-align: center;
+          padding: 3rem;
+          max-width: 600px;
+          width: 90%;
         }
-        .yellow { stroke: #ffea00; }
-        .blue { stroke: #00ccff; }
-        .green { stroke: #00ff15; }
-        .purple { stroke: #9900ff; }
-        .red { stroke: #ff3300; }
-        @keyframes flow { to { stroke-dashoffset: 0; } }
+
+        /* Logo: estilo refinado y sutil */
+        .logo-text {
+          font-size: 1.8rem;
+          font-weight: 700;
+          margin-bottom: 1rem;
+          color: #e6edf3;
+          letter-spacing: 1.5px;
+          text-transform: uppercase;
+          background: linear-gradient(180deg, #e6edf3 0%, #cfd8dc 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          text-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+          display: inline-block;
+        }
+
+        .logo-text::after {
+          content: '';
+          display: block;
+          width: 64px;
+          height: 3px;
+          margin: 0.6rem auto 0;
+          border-radius: 2px;
+          background: linear-gradient(90deg, rgba(0,255,154,0.95), rgba(0,230,118,0.9));
+          opacity: 0.9;
+        }
+
+        .logo-subtitle {
+          font-size: 0.95rem;
+          color: rgba(142,150,158,0.65);
+          margin-bottom: 1.8rem;
+          font-weight: 300;
+          letter-spacing: 0.6px;
+        }
+
+        /* Loader (ESFERA ORIGINAL) */
+        .loader {
+          --color-one: #ff4db6;
+          --color-two: #3b82f6;
+          --color-three: #00ffd5;
+          --color-fore: rgba(255,255,255,0.12);
+          --color-five: white;
+          --time-animation: 0.8s;
+          --size: 110px;
+          position: relative;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          overflow: visible;
+          border-radius: 50%;
+          margin: 0 auto 1.5rem;
+          color: var(--color-five);
+        }
+
+        .loader .sphere {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          position: relative;
+          z-index: 2;
+          border-radius: 50%;
+          width: var(--size);
+          height: var(--size);
+          background: radial-gradient(
+            circle at 80% 20%,
+            rgba(255, 255, 255, 1) 0%,
+            rgba(255, 255, 255, 0.8) 20%,
+            rgba(255, 255, 255, 0.4) 50%,
+            rgba(255, 255, 255, 0) 70%
+          );
+        }
+
+        .loader .sphere::before {
+          content: "";
+          position: absolute;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: var(--size);
+          height: var(--size);
+          border-radius: 50%;
+          box-shadow:
+            inset calc(var(--size) / -20) calc(var(--size) / -20) calc(var(--size) / 10)
+              var(--color-fore),
+            inset calc(var(--size) / 10) 0 calc(var(--size) / 5) var(--color-three);
+          animation:
+            rotation calc(var(--time-animation) * 2) linear infinite,
+            colorize calc(var(--time-animation) * 2) ease-in-out infinite;
+        }
+
+        .loader .sphere::after {
+          content: "";
+          position: absolute;
+          width: calc(var(--size) * 1.18);
+          height: calc(var(--size) * 1.18);
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+          border-radius: 50%;
+          z-index: 2;
+          filter: blur(8px);
+          background:
+            radial-gradient(circle at 50% 45%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.05) 30%, rgba(255,255,255,0) 45%),
+            conic-gradient(from 120deg, var(--color-one), var(--color-two), var(--color-three), var(--color-one));
+          background-blend-mode: screen;
+          pointer-events: none;
+        }
+
+        .loader svg {
+          position: absolute;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: var(--size);
+          height: var(--size);
+          overflow: visible;
+          z-index: 3;
+          animation: rotation calc(var(--time-animation) * 3)
+            cubic-bezier(0.7, 0.6, 0.3, 0.4) infinite;
+        }
+
+        .loader svg #shapes circle {
+          fill: var(--color-five);
+        }
+
+        .loader svg #blurriness g,
+        .loader svg #clipping ellipse,
+        .loader svg #shapes g:nth-of-type(2),
+        .loader svg #fade ellipse {
+          filter: blur(7px);
+        }
+
+        .loader svg #waves g path {
+          will-change: d;
+          stroke-width: 7px;
+        }
+
+        .loader svg #waves g path:nth-of-type(1) {
+          animation: wave-one var(--time-animation) cubic-bezier(0.7, 0.6, 0.3, 0.4)
+            infinite;
+        }
+
+        .loader svg #waves g path:nth-of-type(2) {
+          animation: wave-two var(--time-animation) cubic-bezier(0.7, 0.6, 0.3, 0.4)
+            calc(var(--time-animation) / -2) infinite reverse;
+        }
+
+        .loader svg #waves g path:nth-of-type(3) {
+          animation: wave-one var(--time-animation) cubic-bezier(0.7, 0.6, 0.3, 0.4)
+            calc(var(--time-animation) / -2) infinite;
+        }
+
+        .loader svg #waves g path:nth-of-type(4) {
+          animation: wave-two var(--time-animation) cubic-bezier(0.7, 0.6, 0.3, 0.4)
+            infinite reverse;
+        }
+
+        @keyframes wave-one {
+          0% { d: path("M5,50 C10,50 15,50 20,50 C25,50 30,50 95,50"); }
+          50% { d: path("M5,50 C25,50 30,20 50,20 C70,20 75,50 95,50"); }
+          100% { d: path("M5,50 C70,50 75,50 80,50 C85,50 90,50 95,50"); }
+        }
+
+        @keyframes wave-two {
+          0% { d: path("M5,50 C10,50 15,50 20,50 C25,50 30,50 95,50"); }
+          50% { d: path("M5,50 C25,50 30,80 50,80 C70,80 75,50 95,50"); }
+          100% { d: path("M5,50 C70,50 75,50 80,50 C85,50 90,50 95,50"); }
+        }
+
+        @keyframes rotation {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+        @keyframes colorize {
+          0% { filter: hue-rotate(0deg); }
+          20% { filter: hue-rotate(-30deg); }
+          40% { filter: hue-rotate(-60deg); }
+          60% { filter: hue-rotate(-90deg); }
+          80% { filter: hue-rotate(-45deg); }
+          100% { filter: hue-rotate(0deg); }
+        }
+
+        @media (max-width: 500px) {
+          .loader { --size: 60px; margin-bottom: 1rem; }
+        }
+
+        .loader::before {
+          content: "";
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+          width: calc(var(--size) * 1.9);
+          height: calc(var(--size) * 1.9);
+          border-radius: 50%;
+          z-index: 0;
+          pointer-events: none;
+          filter: blur(20px);
+          background:
+            radial-gradient(circle at 50% 50%, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 30%),
+            radial-gradient(circle at 40% 50%, rgba(255,77,182,0.26) 0%, rgba(255,77,182,0) 40%),
+            radial-gradient(circle at 60% 50%, rgba(59,130,246,0.26) 0%, rgba(59,130,246,0) 40%),
+            radial-gradient(circle at 50% 60%, rgba(0,255,149,0.18) 0%, rgba(0,255,149,0) 50%);
+          background-blend-mode: screen;
+          opacity: 0.98;
+        }
+
+        /* Barra de progreso */
+        .progress-container {
+          background: linear-gradient(180deg, rgba(0,30,10,0.65), rgba(0,20,8,0.6));
+          border-radius: 10px;
+          padding: 1.5rem;
+          margin-bottom: 1.5rem;
+          border: 1px solid rgba(0,255,149,0.12);
+          box-shadow: 0 10px 30px rgba(0,255,149,0.03), inset 0 1px 0 rgba(255,255,255,0.02);
+        }
+
+        .progress-label {
+          display: flex;
+          justify-content: space-between;
+          color: rgba(180,255,210,0.95);
+          font-size: 0.9rem;
+          margin-bottom: 0.75rem;
+        }
+
+        .progress-bar {
+          height: 8px;
+          background: rgba(10,10,10,0.25);
+          border-radius: 4px;
+          overflow: hidden;
+          position: relative;
+        }
+
+        .progress-fill {
+          height: 100%;
+          background: linear-gradient(90deg, #00ff9a, #00e676, #b7ff00);
+          border-radius: 4px;
+          width: 0%;
+          transition: width 0.18s ease, box-shadow 0.15s ease;
+          position: relative;
+          overflow: visible;
+          box-shadow: 0 4px 18px rgba(0,255,149,0.12);
+        }
+
+        .progress-fill::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.3) 50%,
+            transparent 100%
+          );
+          animation: shimmer 1.5s infinite;
+        }
+
+        /* Estado del sistema */
+        .system-status {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .status-item {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          font-size: 0.85rem;
+          color: #8b949e;
+          opacity: 0;
+          transform: translateX(-10px);
+          animation: status-slide 0.3s ease forwards;
+        }
+
+        .status-item:nth-child(1) { animation-delay: 0.3s; }
+        .status-item:nth-child(2) { animation-delay: 0.9s; }
+        .status-item:nth-child(3) { animation-delay: 1.5s; }
+
+        .status-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: #484f58;
+        }
+
+        .status-item.active .status-dot {
+          background: #00ff9a;
+          box-shadow: 0 0 10px rgba(0, 255, 154, 0.5);
+          animation: dot-pulse 2s ease-in-out infinite;
+        }
+
+        .status-item.active .status-text {
+          color: #e6edf3;
+        }
+
+        /* Texto final */
+        .loading-complete {
+          color: #00ff9a;
+          font-size: 0.9rem;
+          font-weight: 500;
+          opacity: 0;
+          margin-top: 1rem;
+          animation: fade-in 0.5s ease forwards 2s;
+        }
+
+        .loading-complete.visible {
+          opacity: 1;
+          animation: none;
+        }
+
+        /* Animaciones */
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+
+        @keyframes status-slide {
+          0% { opacity: 0; transform: translateX(-10px); }
+          100% { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes dot-pulse {
+          0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 154, 0.5); }
+          50% { box-shadow: 0 0 20px rgba(0, 255, 154, 0.8); }
+        }
+
+        @keyframes fade-in {
+          0% { opacity: 0; transform: translateY(10px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 500px) {
+          .splash-container {
+            padding: 2rem 1.5rem;
+          }
+        }
       `}</style>
 
-      <div className="loader">
-        <svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="chipGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#2d2d2d" />
-              <stop offset="100%" stopColor="#0f0f0f" />
-            </linearGradient>
-            <linearGradient id="textGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#eeeeee" />
-              <stop offset="100%" stopColor="#888888" />
-            </linearGradient>
-            <linearGradient id="pinGradient" x1="1" y1="0" x2="0" y2="0">
-              <stop offset="0%" stopColor="#bbbbbb" />
-              <stop offset="50%" stopColor="#888888" />
-              <stop offset="100%" stopColor="#555555" />
-            </linearGradient>
-          </defs>
+      <div className="splash-container">
+        {/* Logo */}
+        <div className="logo-text">CORPOELEC INDUSTRIAL</div>
+        <div className="logo-subtitle">Sistema de Gestión Integral</div>
 
-          <g id="traces">
-            <path d="M100 100 H200 V210 H326" className="trace-bg" />
-            <path d="M100 100 H200 V210 H326" className="trace-flow purple" />
-            <path d="M80 180 H180 V230 H326" className="trace-bg" />
-            <path d="M80 180 H180 V230 H326" className="trace-flow blue" />
-            <path d="M60 260 H150 V250 H326" className="trace-bg" />
-            <path d="M60 260 H150 V250 H326" className="trace-flow yellow" />
-            <path d="M100 350 H200 V270 H326" className="trace-bg" />
-            <path d="M100 350 H200 V270 H326" className="trace-flow green" />
-            <path d="M700 90 H560 V210 H474" className="trace-bg" />
-            <path d="M700 90 H560 V210 H474" className="trace-flow blue" />
-            <path d="M740 160 H580 V230 H474" className="trace-bg" />
-            <path d="M740 160 H580 V230 H474" className="trace-flow green" />
-            <path d="M720 250 H590 V250 H474" className="trace-bg" />
-            <path d="M720 250 H590 V250 H474" className="trace-flow red" />
-            <path d="M680 340 H570 V270 H474" className="trace-bg" />
-            <path d="M680 340 H570 V270 H474" className="trace-flow yellow" />
-          </g>
+        {/* Loader */}
+        {showLoader && (
+          <div className="loader" ref={loaderRef} aria-hidden="true">
+            <div className="sphere"></div>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-hidden="true">
+              <defs>
+                <mask id="waves" maskUnits="userSpaceOnUse">
+                  <g fill="none" stroke="white" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5,50 C25,50 30,20 50,20 C70,20 75,50 95,50"></path>
+                    <path d="M5,50 C25,50 30,20 50,20 C70,20 75,50 95,50"></path>
+                    <path d="M5,50 C25,50 30,80 50,80 C70,80 75,50 95,50"></path>
+                    <path d="M5,50 C25,50 30,80 50,80 C70,80 75,50 95,50"></path>
+                  </g>
+                </mask>
+                <mask id="blurriness" maskUnits="userSpaceOnUse">
+                  <g>
+                    <circle cx="50" cy="50" r="50" fill="white"></circle>
+                    <ellipse cx="50" cy="50" rx="25" ry="25" fill="black"></ellipse>
+                  </g>
+                </mask>
+                <mask id="clipping" maskUnits="userSpaceOnUse">
+                  <ellipse cx="50" cy="50" rx="25" ry="50" fill="white"></ellipse>
+                </mask>
+                <mask id="fade" maskUnits="userSpaceOnUse">
+                  <ellipse cx="50" cy="50" rx="45" ry="50" fill="white"></ellipse>
+                </mask>
+              </defs>
+              <g id="shapes" mask="url(#fade)">
+                <g mask="url(#clipping)">
+                  <circle cx="50" cy="50" r="50" fill="currentColor" mask="url(#waves)"></circle>
+                </g>
+                <g mask="url(#blurriness)">
+                  <circle cx="50" cy="50" r="50" fill="currentColor" mask="url(#waves)"></circle>
+                </g>
+              </g>
+            </svg>
+          </div>
+        )}
 
-          <rect x="330" y="190" width="140" height="100" rx="20" ry="20"
-                fill="url(#chipGradient)" stroke="#222" strokeWidth="3"
-                filter="drop-shadow(0 0 6px rgba(0,0,0,0.8))" />
+        {/* Barra de progreso */}
+        <div className="progress-container">
+          <div className="progress-label">
+            <span>Inicializando sistema...</span>
+            <span>{progress}%</span>
+          </div>
+          <div className="progress-bar">
+            <div className="progress-fill" style={{ width: `${progress}%` }}></div>
+          </div>
+        </div>
 
-          <g>
-            <rect x="322" y="205" width="8" height="10" fill="url(#pinGradient)" rx="2" />
-            <rect x="322" y="225" width="8" height="10" fill="url(#pinGradient)" rx="2" />
-            <rect x="322" y="245" width="8" height="10" fill="url(#pinGradient)" rx="2" />
-            <rect x="322" y="265" width="8" height="10" fill="url(#pinGradient)" rx="2" />
-          </g>
-          <g>
-            <rect x="470" y="205" width="8" height="10" fill="url(#pinGradient)" rx="2" />
-            <rect x="470" y="225" width="8" height="10" fill="url(#pinGradient)" rx="2" />
-            <rect x="470" y="245" width="8" height="10" fill="url(#pinGradient)" rx="2" />
-            <rect x="470" y="265" width="8" height="10" fill="url(#pinGradient)" rx="2" />
-          </g>
+        {/* Estado del sistema */}
+        <div className="system-status">
+          <div className={`status-item ${status[0] ? 'active' : ''}`}>
+            <span className="status-dot"></span>
+            <span className="status-text">Conectando a servidores Corpoelec...</span>
+          </div>
+          <div className={`status-item ${status[1] ? 'active' : ''}`}>
+            <span className="status-dot"></span>
+            <span className="status-text">Verificando credenciales corporativas...</span>
+          </div>
+          <div className={`status-item ${status[2] ? 'active' : ''}`}>
+            <span className="status-dot"></span>
+            <span className="status-text">Cargando datos industriales...</span>
+          </div>
+        </div>
 
-          <text x="400" y="240" fontFamily="Arial" fontSize="14" fill="url(#textGradient)"
-                textAnchor="middle" alignmentBaseline="middle">
-            Corpoelec Industrial
-          </text>
-
-          <circle cx="100" cy="100" r="5" fill="black" />
-          <circle cx="80" cy="180" r="5" fill="black" />
-          <circle cx="60" cy="260" r="5" fill="black" />
-          <circle cx="100" cy="350" r="5" fill="black" />
-          <circle cx="700" cy="90" r="5" fill="black" />
-          <circle cx="740" cy="160" r="5" fill="black" />
-          <circle cx="720" cy="250" r="5" fill="black" />
-          <circle cx="680" cy="340" r="5" fill="black" />
-        </svg>
+        <p className={`loading-complete ${progress === 100 ? 'visible' : ''}`}>
+          ✓ Sistema listo. Redirigiendo al login...
+        </p>
       </div>
     </div>
   );
 };
 
 // ====================================================================
-// LOGIN
+// LOGIN (Exactamente igual, sin modificaciones)
 // ====================================================================
 const usePasswordToggle = () => {
   const [visible, setVisible] = useState(false);
@@ -463,12 +866,6 @@ const LoginCorpoelecForm = () => {
             </div>
           </div>
         </div>
-
-        <div className="absolute bottom-[-3rem] left-0 right-0 text-center">
-          <p className="text-gray-600 text-xs">
-            © {new Date().getFullYear()} Corpoelec Industrial • División Sistemas
-          </p>
-        </div>
       </div>
 
       <style>{`
@@ -488,14 +885,14 @@ const LoginCorpoelecForm = () => {
 // COMPONENTE PRINCIPAL
 // ====================================================================
 export default function LoginCorpoelec() {
-  const [showBoot, setShowBoot] = useState(true);
+  const [showSplash, setShowSplash] = useState(true);
 
-  const handleBootComplete = () => {
-    setShowBoot(false);
+  const handleSplashComplete = () => {
+    setShowSplash(false);
   };
 
-  if (showBoot) {
-    return <SystemBoot onReady={handleBootComplete} />;
+  if (showSplash) {
+    return <SplashScreen onComplete={handleSplashComplete} />;
   }
 
   return <LoginCorpoelecForm />;

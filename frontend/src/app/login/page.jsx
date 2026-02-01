@@ -1,0 +1,502 @@
+"use client";
+
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { Eye, EyeOff, Shield, Zap, Lock, User, CheckCircle, AlertCircle, ChevronRight } from 'lucide-react';
+
+// ====================================================================
+// PANTALLA DE CARGA CHIP CON CABLES
+// ====================================================================
+const SystemBoot = ({ onReady }) => {
+  useEffect(() => {
+    const timer = setTimeout(() => onReady(), 3000);
+    return () => clearTimeout(timer);
+  }, [onReady]);
+
+  return (
+    <div className="main-container">
+      <style jsx>{`
+        .main-container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+          width: 100%;
+          background: #000;
+        }
+        .loader { width: 100%; max-width: 800px; height: 500px; }
+        .trace-bg { stroke: #333; stroke-width: 1.8; fill: none; }
+        .trace-flow {
+          stroke-width: 1.8;
+          fill: none;
+          stroke-dasharray: 40 400;
+          stroke-dashoffset: 438;
+          filter: drop-shadow(0 0 6px currentColor);
+          animation: flow 3s cubic-bezier(0.5, 0, 0.9, 1) infinite;
+        }
+        .yellow { stroke: #ffea00; }
+        .blue { stroke: #00ccff; }
+        .green { stroke: #00ff15; }
+        .purple { stroke: #9900ff; }
+        .red { stroke: #ff3300; }
+        @keyframes flow { to { stroke-dashoffset: 0; } }
+      `}</style>
+
+      <div className="loader">
+        <svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="chipGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#2d2d2d" />
+              <stop offset="100%" stopColor="#0f0f0f" />
+            </linearGradient>
+            <linearGradient id="textGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#eeeeee" />
+              <stop offset="100%" stopColor="#888888" />
+            </linearGradient>
+            <linearGradient id="pinGradient" x1="1" y1="0" x2="0" y2="0">
+              <stop offset="0%" stopColor="#bbbbbb" />
+              <stop offset="50%" stopColor="#888888" />
+              <stop offset="100%" stopColor="#555555" />
+            </linearGradient>
+          </defs>
+
+          <g id="traces">
+            <path d="M100 100 H200 V210 H326" className="trace-bg" />
+            <path d="M100 100 H200 V210 H326" className="trace-flow purple" />
+            <path d="M80 180 H180 V230 H326" className="trace-bg" />
+            <path d="M80 180 H180 V230 H326" className="trace-flow blue" />
+            <path d="M60 260 H150 V250 H326" className="trace-bg" />
+            <path d="M60 260 H150 V250 H326" className="trace-flow yellow" />
+            <path d="M100 350 H200 V270 H326" className="trace-bg" />
+            <path d="M100 350 H200 V270 H326" className="trace-flow green" />
+            <path d="M700 90 H560 V210 H474" className="trace-bg" />
+            <path d="M700 90 H560 V210 H474" className="trace-flow blue" />
+            <path d="M740 160 H580 V230 H474" className="trace-bg" />
+            <path d="M740 160 H580 V230 H474" className="trace-flow green" />
+            <path d="M720 250 H590 V250 H474" className="trace-bg" />
+            <path d="M720 250 H590 V250 H474" className="trace-flow red" />
+            <path d="M680 340 H570 V270 H474" className="trace-bg" />
+            <path d="M680 340 H570 V270 H474" className="trace-flow yellow" />
+          </g>
+
+          <rect x="330" y="190" width="140" height="100" rx="20" ry="20"
+                fill="url(#chipGradient)" stroke="#222" strokeWidth="3"
+                filter="drop-shadow(0 0 6px rgba(0,0,0,0.8))" />
+
+          <g>
+            <rect x="322" y="205" width="8" height="10" fill="url(#pinGradient)" rx="2" />
+            <rect x="322" y="225" width="8" height="10" fill="url(#pinGradient)" rx="2" />
+            <rect x="322" y="245" width="8" height="10" fill="url(#pinGradient)" rx="2" />
+            <rect x="322" y="265" width="8" height="10" fill="url(#pinGradient)" rx="2" />
+          </g>
+          <g>
+            <rect x="470" y="205" width="8" height="10" fill="url(#pinGradient)" rx="2" />
+            <rect x="470" y="225" width="8" height="10" fill="url(#pinGradient)" rx="2" />
+            <rect x="470" y="245" width="8" height="10" fill="url(#pinGradient)" rx="2" />
+            <rect x="470" y="265" width="8" height="10" fill="url(#pinGradient)" rx="2" />
+          </g>
+
+          <text x="400" y="240" fontFamily="Arial" fontSize="14" fill="url(#textGradient)"
+                textAnchor="middle" alignmentBaseline="middle">
+            Corpoelec Industrial
+          </text>
+
+          <circle cx="100" cy="100" r="5" fill="black" />
+          <circle cx="80" cy="180" r="5" fill="black" />
+          <circle cx="60" cy="260" r="5" fill="black" />
+          <circle cx="100" cy="350" r="5" fill="black" />
+          <circle cx="700" cy="90" r="5" fill="black" />
+          <circle cx="740" cy="160" r="5" fill="black" />
+          <circle cx="720" cy="250" r="5" fill="black" />
+          <circle cx="680" cy="340" r="5" fill="black" />
+        </svg>
+      </div>
+    </div>
+  );
+};
+
+// ====================================================================
+// LOGIN
+// ====================================================================
+const usePasswordToggle = () => {
+  const [visible, setVisible] = useState(false);
+  const toggle = useCallback(() => setVisible(v => !v), []);
+  return { type: visible ? 'text' : 'password', icon: visible ? <EyeOff size={18} /> : <Eye size={18} />, toggle };
+};
+
+const PasswordStrength = ({ password }) => {
+  const getStrength = () => {
+    let score = 0;
+    if (password.length >= 6) score++;
+    if (password.length >= 10) score++;
+    if (/[A-Z]/.test(password)) score++;
+    if (/[0-9]/.test(password)) score++;
+    if (/[^A-Za-z0-9]/.test(password)) score++;
+    return Math.min(score, 4);
+  };
+
+  const strength = getStrength();
+  const labels = ['Muy débil', 'Débil', 'Regular', 'Fuerte', 'Excelente'];
+  const colors = ['bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-lime-500', 'bg-green-500'];
+
+  if (!password) return null;
+
+  return (
+    <div className="mt-2 space-y-1">
+      <div className="flex gap-1">
+        {[1, 2, 3, 4].map(level => (
+          <div
+            key={level}
+            className={`h-1 flex-1 rounded-full ${
+              strength >= level ? colors[strength - 1] : 'bg-gray-700'
+            }`}
+          />
+        ))}
+      </div>
+      <p className={`text-xs ${
+        strength >= 3 ? 'text-green-400' : strength >= 2 ? 'text-yellow-400' : 'text-red-400'
+      }`}>
+        {labels[strength - 1]}
+      </p>
+    </div>
+  );
+};
+
+const AnimatedInput = ({
+  id, label, value, onChange, type, placeholder, icon: Icon,
+  error, showError, autoComplete, required
+}) => {
+  const [isFocused, setIsFocused] = useState(false);
+  const hasValue = value.length > 0;
+
+  return (
+    <div className="relative">
+      <label
+        htmlFor={id}
+        className={`absolute left-12 transition-all duration-300 z-10 ${
+          isFocused || hasValue
+            ? '-top-2 left-8 text-xs px-2 bg-transparent font-semibold uppercase tracking-wider'
+            : 'top-4 text-gray-400'
+        } ${isFocused ? 'text-green-400' : 'text-gray-400'}`}
+      >
+        {label}
+      </label>
+      
+      <div className={`relative flex items-center rounded-xl ${
+        error ? 'bg-red-500/10' : 'bg-gray-900/50'
+      } ${isFocused ? 'ring-2 ring-green-500/40' : ''}`}>
+        <div className={`pl-4 pr-2 ${isFocused ? 'text-green-400' : 'text-gray-500'}`}>
+          <Icon size={20} />
+        </div>
+        
+        <input
+          id={id}
+          type={type}
+          value={value}
+          onChange={onChange}
+          placeholder={isFocused ? placeholder : ''}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          autoComplete={autoComplete}
+          required={required}
+          className="w-full px-4 py-4 bg-transparent text-white placeholder-gray-500/50 focus:outline-none"
+        />
+        
+        {value && !error && (
+          <div className="pr-4 text-green-400">
+            <CheckCircle size={18} />
+          </div>
+        )}
+      </div>
+
+      {error && showError && (
+        <div className="flex items-center mt-2 text-red-400 text-xs animate-shake">
+          <AlertCircle size={14} className="mr-1" />
+          <span>{error}</span>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const LoadingButton = ({ isLoading, children, ...props }) => (
+  <button
+    {...props}
+    disabled={isLoading}
+    className={`relative overflow-hidden w-full py-4 rounded-xl font-bold text-lg tracking-wide transition-all duration-300 transform hover:scale-[1.01] active:scale-[0.99] disabled:transform-none ${
+      isLoading
+        ? 'bg-gray-700 cursor-not-allowed'
+        : 'bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-500 hover:to-emerald-600 shadow-green-500/30 hover:shadow-green-500/50'
+    } shadow-lg`}
+  >
+    {isLoading && (
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="flex gap-1">
+          {[0, 1, 2].map(i => (
+            <div
+              key={i}
+              className="w-2 h-2 bg-white rounded-full animate-bounce"
+              style={{ animationDelay: `${i * 0.1}s` }}
+            />
+          ))}
+        </div>
+      </div>
+    )}
+    <span className={isLoading ? 'invisible' : ''}>{children}</span>
+  </button>
+);
+
+const Particles = () => {
+  const particles = Array.from({ length: 20 }, (_, i) => ({
+    id: i,
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    size: Math.random() * 4 + 2,
+    duration: Math.random() * 20 + 15,
+    delay: Math.random() * 5,
+  }));
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {particles.map(p => (
+        <div
+          key={p.id}
+          className="absolute bg-green-500/20 rounded-full animate-float"
+          style={{
+            left: `${p.x}%`,
+            top: `${p.y}%`,
+            width: p.size,
+            height: p.size,
+            animationDuration: `${p.duration}s`,
+            animationDelay: `${p.delay}s`,
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
+const LoginCorpoelecForm = () => {
+  const [formData, setFormData] = useState({ username: '', password: '' });
+  const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false);
+  const formRef = useRef(null);
+
+  const { type: passwordType, icon: passwordIcon, toggle: togglePassword } = usePasswordToggle();
+
+  useEffect(() => {
+    const elements = formRef.current?.children;
+    if (elements) {
+      Array.from(elements).forEach((el, i) => {
+        if (el.style) {
+          el.style.opacity = '0';
+          el.style.transform = 'translateY(20px)';
+          el.style.animation = `fadeInUp 0.6s ease forwards ${i * 0.1}s`;
+        }
+      });
+    }
+  }, []);
+
+  const validate = useCallback(() => {
+    const newErrors = {};
+    const { username, password } = formData;
+
+    if (!username.trim()) newErrors.username = 'Usuario corporativo requerido';
+    else if (username.length < 4) newErrors.username = 'Mínimo 4 caracteres';
+
+    if (!password) newErrors.password = 'Contraseña requerida';
+    else if (password.length < 6) newErrors.password = 'Mínimo 6 caracteres';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }, [formData]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validate()) {
+      const form = formRef.current;
+      if (form) {
+        form.style.animation = 'none';
+        form.offsetHeight;
+        form.style.animation = 'shake 0.5s ease';
+      }
+      return;
+    }
+
+    setIsLoading(true);
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    console.log('✅ Acceso autorizado');
+    setLoginSuccess(true);
+    setIsLoading(false);
+  };
+
+  const handleChange = (field) => (e) => {
+    setFormData(prev => ({ ...prev, [field]: e.target.value }));
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: undefined }));
+    }
+  };
+
+  if (loginSuccess) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 relative bg-gradient-to-br from-gray-900 via-black to-gray-900">
+        <Particles />
+        <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 via-transparent to-emerald-500/10" />
+        <div className="relative max-w-md w-full text-center animate-scaleIn">
+          <div className="bg-gray-900/80 backdrop-blur-xl rounded-3xl border border-green-500/50 p-12 shadow-2xl">
+            <div className="w-24 h-24 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
+              <CheckCircle size={48} className="text-green-400" />
+            </div>
+            <h2 className="text-3xl font-bold text-white mb-2">¡Bienvenido!</h2>
+            <p className="text-gray-400 mb-6">Redirigiendo al Dashboard...</p>
+            <div className="flex justify-center gap-2">
+              <div className="w-3 h-3 bg-green-400 rounded-full animate-bounce" />
+              <div className="w-3 h-3 bg-green-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+              <div className="w-3 h-3 bg-green-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div 
+      className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
+      style={{
+        backgroundImage: "url('/logo-bg.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/90 to-black/95" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(34,197,94,0.1),transparent_50%)]" />
+      <Particles />
+      <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-green-500/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-1/4 left-1/4 w-72 h-72 bg-emerald-500/5 rounded-full blur-3xl" />
+
+      <div className="relative w-full max-w-md" ref={formRef}>
+        <div className="bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] overflow-hidden">
+          <div className="relative px-8 py-10 text-center border-b border-gray-700/30">
+            <div className="absolute top-4 right-4 flex items-center gap-1 bg-green-500/20 px-3 py-1 rounded-full">
+              <Shield size={14} className="text-green-400" />
+              <span className="text-xs text-green-400 font-medium">Alfa 2026 V-1.0</span>
+            </div>
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-700 rounded-2xl flex items-center justify-center shadow-lg">
+                <Zap size={32} className="text-white" />
+              </div>
+            </div>
+            <h1 className="text-3xl font-bold text-white tracking-tight">
+              CORPOELEC <span className="text-green-400">INDUSTRIAL</span>
+            </h1>
+            <p className="text-gray-400 mt-2 text-sm flex items-center justify-center gap-2">
+              <Lock size={14} />
+              Sistema de Gestión Empresarial
+            </p>
+          </div>
+
+          <div className="px-8 pb-8 pt-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <AnimatedInput
+                id="username"
+                label="Usuario Corporativo"
+                value={formData.username}
+                onChange={handleChange('username')}
+                placeholder="ej: JPEREZ"
+                icon={User}
+                error={errors.username}
+                showError={!!errors.username}
+                autoComplete="username"
+                required
+              />
+
+              <div>
+                <AnimatedInput
+                  id="password"
+                  label="Contraseña Segura"
+                  value={formData.password}
+                  onChange={handleChange('password')}
+                  placeholder="••••••••"
+                  type={passwordType}
+                  icon={Lock}
+                  error={errors.password}
+                  showError={!!errors.password}
+                  autoComplete="current-password"
+                  required
+                />
+                <PasswordStrength password={formData.password} />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-green-500 focus:ring-green-500/50"
+                  />
+                  <span className="text-sm text-gray-400 group-hover:text-gray-300">
+                    Recordarme
+                  </span>
+                </label>
+                <a href="#" className="text-sm text-green-400 hover:text-green-300 flex items-center gap-1">
+                  ¿Olvidó su contraseña?
+                  <ChevronRight size={14} />
+                </a>
+              </div>
+
+              <LoadingButton isLoading={isLoading}>
+                <span className="flex items-center justify-center gap-2">
+                  <Shield size={20} />
+                  ACCEDER AL SISTEMA
+                </span>
+              </LoadingButton>
+            </form>
+          </div>
+
+          <div className="px-8 py-6 border-t border-gray-700/30 bg-gray-900/30">
+            <div className="flex items-center justify-center gap-2 text-gray-500 text-sm">
+              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              <span>Sistema operativo • Conexión Segura En Desarrollo</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="absolute bottom-[-3rem] left-0 right-0 text-center">
+          <p className="text-gray-600 text-xs">
+            © {new Date().getFullYear()} Corpoelec Industrial • División Sistemas
+          </p>
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100%{transform:translateX(0);} 20%,60%{transform:translateX(-10px);} 40%,80%{transform:translateX(10px);} }
+        @keyframes scaleIn { from { opacity:0; transform:scale(0.8); } to { opacity:1; transform:scale(1); } }
+        @keyframes float { 0%,100%{transform:translateY(0) scale(1); opacity:0.2;} 50%{transform:translateY(-20px) scale(1.2); opacity:0.4;} }
+        .animate-float { animation: float infinite ease-in-out; }
+        .animate-shake { animation: shake 0.5s ease; }
+        .animate-scaleIn { animation: scaleIn 0.5s ease forwards; }
+      `}</style>
+    </div>
+  );
+};
+
+// ====================================================================
+// COMPONENTE PRINCIPAL
+// ====================================================================
+export default function LoginCorpoelec() {
+  const [showBoot, setShowBoot] = useState(true);
+
+  const handleBootComplete = () => {
+    setShowBoot(false);
+  };
+
+  if (showBoot) {
+    return <SystemBoot onReady={handleBootComplete} />;
+  }
+
+  return <LoginCorpoelecForm />;
+}

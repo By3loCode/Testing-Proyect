@@ -28,7 +28,8 @@ body {
 /* Splash Screen Styles */
 .splash-screen {
     min-height: 100vh;
-    background: linear-gradient(145deg, #0d1117 0%, #161b22 100%);
+    /* RED REFACTOR: Premium Warm Dark Background (Black -> Very Dark Red) */
+    background: radial-gradient(circle at center, #1a0505 0%, #000000 100%);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -66,7 +67,8 @@ body {
     height: 3px;
     margin: 0.6rem auto 0;
     border-radius: 2px;
-    background: linear-gradient(90deg, rgba(0,255,154,0.95), rgba(0,230,118,0.9));
+    /* RED REFACTOR: Changed gradient to Red/Orange */
+    background: linear-gradient(90deg, rgba(239,68,68,0.95), rgba(220,38,38,0.9));
     opacity: 0.9;
   }
 
@@ -80,9 +82,10 @@ body {
 
   /* Loader (ESFERA ORIGINAL) */
   .loader {
-    --color-one: #ff4db6;
-    --color-two: #3b82f6;
-    --color-three: #00ffd5;
+    /* RED REFACTOR: Adjusted neon colors to Red/Pink/Orange spectrum */
+    --color-one: #ff4d4d; /* Red */
+    --color-two: #f97316; /* Orange */
+    --color-three: #ef4444; /* Red-500 */
     --color-fore: rgba(255,255,255,0.12);
     --color-five: white;
     --time-animation: 0.8s;
@@ -242,29 +245,30 @@ body {
     z-index: 0;
     pointer-events: none;
     filter: blur(20px);
+    /* RED REFACTOR: Changed radial gradients to Red/Orange/Pink */
     background:
       radial-gradient(circle at 50% 50%, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 30%),
-      radial-gradient(circle at 40% 50%, rgba(255,77,182,0.26) 0%, rgba(255,77,182,0) 40%),
-      radial-gradient(circle at 60% 50%, rgba(59,130,246,0.26) 0%, rgba(59,130,246,0) 40%),
-      radial-gradient(circle at 50% 60%, rgba(0,255,149,0.18) 0%, rgba(0,255,149,0) 50%);
+      radial-gradient(circle at 40% 50%, rgba(255,77,77,0.26) 0%, rgba(255,77,77,0) 40%),
+      radial-gradient(circle at 60% 50%, rgba(249,115,22,0.26) 0%, rgba(249,115,22,0) 40%),
+      radial-gradient(circle at 50% 60%, rgba(239,68,68,0.18) 0%, rgba(239,68,68,0) 50%);
     background-blend-mode: screen;
     opacity: 0.98;
   }
 
   /* Barra de progreso */
   .progress-container {
-    background: linear-gradient(180deg, rgba(0,30,10,0.65), rgba(0,20,8,0.6));
+    background: linear-gradient(180deg, rgba(30,10,10,0.65), rgba(20,8,8,0.6));
     border-radius: 10px;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
-    border: 1px solid rgba(0,255,149,0.12);
-    box-shadow: 0 10px 30px rgba(0,255,149,0.03), inset 0 1px 0 rgba(255,255,255,0.02);
+    border: 1px solid rgba(239,68,68,0.12);
+    box-shadow: 0 10px 30px rgba(239,68,68,0.03), inset 0 1px 0 rgba(255,255,255,0.02);
   }
 
   .progress-label {
     display: flex;
     justify-content: space-between;
-    color: rgba(180,255,210,0.95);
+    color: rgba(255,200,200,0.95);
     font-size: 0.9rem;
     margin-bottom: 0.75rem;
   }
@@ -279,13 +283,14 @@ body {
 
   .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #00ff9a, #00e676, #b7ff00);
+    /* RED REFACTOR: Gradient changed to Red/Orange */
+    background: linear-gradient(90deg, #ef4444, #f87171, #f97316);
     border-radius: 4px;
     width: 0%;
     transition: width 0.18s ease, box-shadow 0.15s ease;
     position: relative;
     overflow: visible;
-    box-shadow: 0 4px 18px rgba(0,255,149,0.12);
+    box-shadow: 0 4px 18px rgba(239,68,68,0.12);
   }
 
   .progress-fill::after {
@@ -334,8 +339,9 @@ body {
   }
 
   .status-item.active .status-dot {
-    background: #00ff9a;
-    box-shadow: 0 0 10px rgba(0, 255, 154, 0.5);
+    /* RED REFACTOR: changed to red */
+    background: #ef4444;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
     animation: dot-pulse 2s ease-in-out infinite;
   }
 
@@ -345,7 +351,8 @@ body {
 
   /* Texto final */
   .loading-complete {
-    color: #00ff9a;
+    /* RED REFACTOR: changed to red */
+    color: #ef4444;
     font-size: 0.9rem;
     font-weight: 500;
     opacity: 0;
@@ -370,8 +377,9 @@ body {
   }
 
   @keyframes dot-pulse {
-    0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 154, 0.5); }
-    50% { box-shadow: 0 0 20px rgba(0, 255, 154, 0.8); }
+    /* RED REFACTOR: changed shadow to red */
+    0%, 100% { box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.8); }
   }
 
   @keyframes fade-in {

@@ -4,6 +4,41 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Eye, EyeOff, Shield, Zap, Lock, User, CheckCircle, AlertCircle, ChevronRight } from 'lucide-react';
 
 // ====================================================================
+// NEON CHECKBOX COMPONENT
+// ====================================================================
+const NeonCheckbox = ({ checked, onChange }) => (
+  <label className="neon-checkbox">
+    <input type="checkbox" checked={checked} onChange={onChange} />
+    <div className="neon-checkbox__frame">
+      <div className="neon-checkbox__box">
+        <div className="neon-checkbox__check-container">
+          <svg viewBox="0 0 24 24" className="neon-checkbox__check">
+            <path d="M3,12.5l7,7L21,5"></path>
+          </svg>
+        </div>
+        <div className="neon-checkbox__glow"></div>
+        <div className="neon-checkbox__borders">
+          <span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+      <div className="neon-checkbox__effects">
+        <div className="neon-checkbox__particles">
+          <span></span><span></span><span></span><span></span> <span></span><span></span><span></span><span></span> <span></span><span></span><span></span><span></span>
+        </div>
+        <div className="neon-checkbox__rings">
+          <div className="ring"></div>
+          <div className="ring"></div>
+          <div className="ring"></div>
+        </div>
+        <div className="neon-checkbox__sparks">
+          <span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+    </div>
+  </label>
+);
+
+// ====================================================================
 // SPLASH SCREEN - CORPOELEC INDUSTRIAL (Nuevo)
 // ====================================================================
 const SplashScreen = ({ onComplete }) => {
@@ -130,27 +165,28 @@ const SplashScreen = ({ onComplete }) => {
             <span>{progress}%</span>
           </div>
           <div className="progress-bar">
-            <div className="progress-fill" style={{ width: `${progress}%` }}></div>
+            {/* RED REFACTOR: Changed from progress-fill (green) to red style inline or class */}
+            <div className="progress-fill bg-red-600" style={{ width: `${progress}%`, boxShadow: '0 0 10px #ef4444' }}></div>
           </div>
         </div>
 
         {/* Estado del sistema */}
         <div className="system-status">
-          <div className={`status-item ${status[0] ? 'active' : ''}`}>
-            <span className="status-dot"></span>
+          <div className={`status-item ${status[0] ? 'active text-red-400' : ''}`}>
+            <span className={`status-dot ${status[0] ? 'bg-red-500' : ''}`}></span>
             <span className="status-text">Conectando a servidores Corpoelec...</span>
           </div>
-          <div className={`status-item ${status[1] ? 'active' : ''}`}>
-            <span className="status-dot"></span>
+          <div className={`status-item ${status[1] ? 'active text-red-400' : ''}`}>
+            <span className={`status-dot ${status[1] ? 'bg-red-500' : ''}`}></span>
             <span className="status-text">Verificando credenciales corporativas...</span>
           </div>
-          <div className={`status-item ${status[2] ? 'active' : ''}`}>
-            <span className="status-dot"></span>
+          <div className={`status-item ${status[2] ? 'active text-red-400' : ''}`}>
+            <span className={`status-dot ${status[2] ? 'bg-red-500' : ''}`}></span>
             <span className="status-text">Cargando datos industriales...</span>
           </div>
         </div>
 
-        <p className={`loading-complete ${progress === 100 ? 'visible' : ''}`}>
+        <p className={`loading-complete text-red-400 ${progress === 100 ? 'visible' : ''}`}>
           ✓ Sistema listo. Redirigiendo al login...
         </p>
       </div>
@@ -159,7 +195,7 @@ const SplashScreen = ({ onComplete }) => {
 };
 
 // ====================================================================
-// LOGIN (Exactamente igual, sin modificaciones)
+// LOGIN
 // ====================================================================
 const usePasswordToggle = () => {
   const [visible, setVisible] = useState(false);
@@ -180,7 +216,8 @@ const PasswordStrength = ({ password }) => {
 
   const strength = getStrength();
   const labels = ['Muy débil', 'Débil', 'Regular', 'Fuerte', 'Excelente'];
-  const colors = ['bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-lime-500', 'bg-green-500'];
+  // RED REFACTOR: Colors adapted to red/orange scale
+  const colors = ['bg-red-800', 'bg-red-600', 'bg-orange-500', 'bg-orange-400', 'bg-red-500'];
 
   if (!password) return null;
 
@@ -197,7 +234,7 @@ const PasswordStrength = ({ password }) => {
         ))}
       </div>
       <p className={`text-xs ${
-        strength >= 3 ? 'text-green-400' : strength >= 2 ? 'text-yellow-400' : 'text-red-400'
+        strength >= 3 ? 'text-orange-400' : strength >= 2 ? 'text-red-400' : 'text-red-600'
       }`}>
         {labels[strength - 1]}
       </p>
@@ -220,15 +257,15 @@ const AnimatedInput = ({
           isFocused || hasValue
             ? '-top-2 left-8 text-xs px-2 bg-transparent font-semibold uppercase tracking-wider'
             : 'top-4 text-gray-400'
-        } ${isFocused ? 'text-green-400' : 'text-gray-400'}`}
+        } ${isFocused ? 'text-red-400' : 'text-gray-400'}`}
       >
         {label}
       </label>
       
       <div className={`relative flex items-center rounded-xl ${
         error ? 'bg-red-500/10' : 'bg-gray-900/50'
-      } ${isFocused ? 'ring-2 ring-green-500/40' : ''}`}>
-        <div className={`pl-4 pr-2 ${isFocused ? 'text-green-400' : 'text-gray-500'}`}>
+      } ${isFocused ? 'ring-2 ring-red-500/40' : ''}`}>
+        <div className={`pl-4 pr-2 ${isFocused ? 'text-red-400' : 'text-gray-500'}`}>
           <Icon size={20} />
         </div>
         
@@ -246,14 +283,14 @@ const AnimatedInput = ({
         />
         
         {value && !error && (
-          <div className="pr-4 text-green-400">
+          <div className="pr-4 text-red-400">
             <CheckCircle size={18} />
           </div>
         )}
       </div>
 
       {error && showError && (
-        <div className="flex items-center mt-2 text-red-400 text-xs animate-shake">
+        <div className="flex items-center mt-2 text-red-500 text-xs animate-shake">
           <AlertCircle size={14} className="mr-1" />
           <span>{error}</span>
         </div>
@@ -269,7 +306,7 @@ const LoadingButton = ({ isLoading, children, ...props }) => (
     className={`relative overflow-hidden w-full py-4 rounded-xl font-bold text-lg tracking-wide transition-all duration-300 transform hover:scale-[1.01] active:scale-[0.99] disabled:transform-none ${
       isLoading
         ? 'bg-gray-700 cursor-not-allowed'
-        : 'bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-500 hover:to-emerald-600 shadow-green-500/30 hover:shadow-green-500/50'
+        : 'bg-gradient-to-r from-red-600 to-orange-700 hover:from-red-500 hover:to-orange-600 shadow-red-500/30 hover:shadow-red-500/50'
     } shadow-lg`}
   >
     {isLoading && (
@@ -304,7 +341,7 @@ const Particles = () => {
       {particles.map(p => (
         <div
           key={p.id}
-          className="absolute bg-green-500/20 rounded-full animate-float"
+          className="absolute bg-red-500/20 rounded-full animate-float"
           style={{
             left: `${p.x}%`,
             top: `${p.y}%`,
@@ -386,18 +423,18 @@ const LoginCorpoelecForm = () => {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 relative bg-gradient-to-br from-gray-900 via-black to-gray-900">
         <Particles />
-        <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 via-transparent to-emerald-500/10" />
+        <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 via-transparent to-orange-500/10" />
         <div className="relative max-w-md w-full text-center animate-scaleIn">
-          <div className="bg-gray-900/80 backdrop-blur-xl rounded-3xl border border-green-500/50 p-12 shadow-2xl">
-            <div className="w-24 h-24 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
-              <CheckCircle size={48} className="text-green-400" />
+          <div className="bg-gray-900/80 backdrop-blur-xl rounded-3xl border border-red-500/50 p-12 shadow-2xl">
+            <div className="w-24 h-24 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
+              <CheckCircle size={48} className="text-red-400" />
             </div>
             <h2 className="text-3xl font-bold text-white mb-2">¡Bienvenido!</h2>
             <p className="text-gray-400 mb-6">Redirigiendo al Dashboard...</p>
             <div className="flex justify-center gap-2">
-              <div className="w-3 h-3 bg-green-400 rounded-full animate-bounce" />
-              <div className="w-3 h-3 bg-green-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-              <div className="w-3 h-3 bg-green-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+              <div className="w-3 h-3 bg-red-400 rounded-full animate-bounce" />
+              <div className="w-3 h-3 bg-red-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+              <div className="w-3 h-3 bg-red-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
             </div>
           </div>
         </div>
@@ -415,25 +452,23 @@ const LoginCorpoelecForm = () => {
       }}
     >
       <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/90 to-black/95" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(34,197,94,0.1),transparent_50%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(239,68,68,0.1),transparent_50%)]" />
       <Particles />
-      <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-green-500/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/4 left-1/4 w-72 h-72 bg-emerald-500/5 rounded-full blur-3xl" />
+      <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-red-500/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-1/4 left-1/4 w-72 h-72 bg-orange-500/5 rounded-full blur-3xl" />
 
       <div className="relative w-full max-w-md" ref={formRef}>
         <div className="bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] overflow-hidden">
           <div className="relative px-8 py-10 text-center border-b border-gray-700/30">
-            <div className="absolute top-4 right-4 flex items-center gap-1 bg-green-500/20 px-3 py-1 rounded-full">
-              <Shield size={14} className="text-green-400" />
-              <span className="text-xs text-green-400 font-medium">Alfa 2026 V-1.0</span>
+            <div className="absolute top-4 right-4 flex items-center gap-1 bg-red-500/20 px-3 py-1 rounded-full">
+              <Shield size={14} className="text-red-400" />
+              <span className="text-xs text-red-400 font-medium">Alfa 2026 V-1.0</span>
             </div>
             <div className="flex justify-center mb-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-700 rounded-2xl flex items-center justify-center shadow-lg">
-                <Zap size={32} className="text-white" />
-              </div>
+              <img src="/logo-rojo.png" alt="Logo" className="h-16 w-auto object-contain" />
             </div>
             <h1 className="text-3xl font-bold text-white tracking-tight">
-              CORPOELEC <span className="text-green-400">INDUSTRIAL</span>
+              CORPOELEC <span className="text-red-500">INDUSTRIAL</span>
             </h1>
             <p className="text-gray-400 mt-2 text-sm flex items-center justify-center gap-2">
               <Lock size={14} />
@@ -474,18 +509,16 @@ const LoginCorpoelecForm = () => {
               </div>
 
               <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 cursor-pointer group">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-green-500 focus:ring-green-500/50"
-                  />
-                  <span className="text-sm text-gray-400 group-hover:text-gray-300">
+                <div className="flex items-center gap-3">
+                  <NeonCheckbox checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
+                  <span 
+                    className="text-sm text-gray-400 cursor-pointer hover:text-white transition-colors"
+                    onClick={() => setRememberMe(!rememberMe)}
+                  >
                     Recordarme
                   </span>
-                </label>
-                <a href="#" className="text-sm text-green-400 hover:text-green-300 flex items-center gap-1">
+                </div>
+                <a href="#" className="text-sm text-red-400 hover:text-red-300 flex items-center gap-1">
                   ¿Olvidó su contraseña?
                   <ChevronRight size={14} />
                 </a>
@@ -502,7 +535,7 @@ const LoginCorpoelecForm = () => {
 
           <div className="px-8 py-6 border-t border-gray-700/30 bg-gray-900/30">
             <div className="flex items-center justify-center gap-2 text-gray-500 text-sm">
-              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
               <span>Sistema operativo • Conexión Segura En Desarrollo</span>
             </div>
           </div>
@@ -517,14 +550,266 @@ const LoginCorpoelecForm = () => {
         .animate-float { animation: float infinite ease-in-out; }
         .animate-shake { animation: shake 0.5s ease; }
         .animate-scaleIn { animation: scaleIn 0.5s ease forwards; }
+
+        /* NEON CHECKBOX STYLES (Adapted to Red Theme) */
+        .neon-checkbox {
+          --primary: #ef4444; /* red-500 */
+          --primary-dark: #b91c1c; /* red-700 */
+          --primary-light: #f87171; /* red-400 */
+          --size: 30px;
+          position: relative;
+          width: var(--size);
+          height: var(--size);
+          cursor: pointer;
+          -webkit-tap-highlight-color: transparent;
+        }
+
+        .neon-checkbox input {
+          display: none;
+        }
+
+        .neon-checkbox__frame {
+          position: relative;
+          width: 100%;
+          height: 100%;
+        }
+
+        .neon-checkbox__box {
+          position: absolute;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.8);
+          border-radius: 4px;
+          border: 2px solid var(--primary-dark);
+          transition: all 0.4s ease;
+        }
+
+        .neon-checkbox__check-container {
+          position: absolute;
+          inset: 2px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .neon-checkbox__check {
+          width: 80%;
+          height: 80%;
+          fill: none;
+          stroke: var(--primary);
+          stroke-width: 3;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+          stroke-dasharray: 40;
+          stroke-dashoffset: 40;
+          transform-origin: center;
+          transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .neon-checkbox__glow {
+          position: absolute;
+          inset: -2px;
+          border-radius: 6px;
+          background: var(--primary);
+          opacity: 0;
+          filter: blur(8px);
+          transform: scale(1.2);
+          transition: all 0.4s ease;
+        }
+
+        .neon-checkbox__borders {
+          position: absolute;
+          inset: 0;
+          border-radius: 4px;
+          overflow: hidden;
+        }
+
+        .neon-checkbox__borders span {
+          position: absolute;
+          width: 40px;
+          height: 1px;
+          background: var(--primary);
+          opacity: 0;
+          transition: opacity 0.4s ease;
+        }
+
+        .neon-checkbox__borders span:nth-child(1) {
+          top: 0;
+          left: -100%;
+          animation: borderFlow1 2s linear infinite;
+        }
+
+        .neon-checkbox__borders span:nth-child(2) {
+          top: -100%;
+          right: 0;
+          width: 1px;
+          height: 40px;
+          animation: borderFlow2 2s linear infinite;
+        }
+
+        .neon-checkbox__borders span:nth-child(3) {
+          bottom: 0;
+          right: -100%;
+          animation: borderFlow3 2s linear infinite;
+        }
+
+        .neon-checkbox__borders span:nth-child(4) {
+          bottom: -100%;
+          left: 0;
+          width: 1px;
+          height: 40px;
+          animation: borderFlow4 2s linear infinite;
+        }
+
+        .neon-checkbox__particles span {
+          position: absolute;
+          width: 4px;
+          height: 4px;
+          background: var(--primary);
+          border-radius: 50%;
+          opacity: 0;
+          pointer-events: none;
+          top: 50%;
+          left: 50%;
+          box-shadow: 0 0 6px var(--primary);
+        }
+
+        .neon-checkbox__rings {
+          position: absolute;
+          inset: -20px;
+          pointer-events: none;
+        }
+
+        .neon-checkbox__rings .ring {
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          border: 1px solid var(--primary);
+          opacity: 0;
+          transform: scale(0);
+        }
+
+        .neon-checkbox__sparks span {
+          position: absolute;
+          width: 20px;
+          height: 1px;
+          background: linear-gradient(90deg, var(--primary), transparent);
+          opacity: 0;
+        }
+
+        /* Hover Effects */
+        .neon-checkbox:hover .neon-checkbox__box {
+          border-color: var(--primary);
+          transform: scale(1.05);
+        }
+
+        /* Checked State */
+        .neon-checkbox input:checked ~ .neon-checkbox__frame .neon-checkbox__box {
+          border-color: var(--primary);
+          background: rgba(239, 68, 68, 0.1); 
+        }
+
+        .neon-checkbox input:checked ~ .neon-checkbox__frame .neon-checkbox__check {
+          stroke-dashoffset: 0;
+          transform: scale(1.1);
+        }
+
+        .neon-checkbox input:checked ~ .neon-checkbox__frame .neon-checkbox__glow {
+          opacity: 0.2;
+        }
+
+        .neon-checkbox
+          input:checked
+          ~ .neon-checkbox__frame
+          .neon-checkbox__borders
+          span {
+          opacity: 1;
+        }
+
+        /* Particle Animations */
+        .neon-checkbox
+          input:checked
+          ~ .neon-checkbox__frame
+          .neon-checkbox__particles
+          span {
+          animation: particleExplosion 0.6s ease-out forwards;
+        }
+
+        .neon-checkbox
+          input:checked
+          ~ .neon-checkbox__frame
+          .neon-checkbox__rings
+          .ring {
+          animation: ringPulse 0.6s ease-out forwards;
+        }
+
+        .neon-checkbox
+          input:checked
+          ~ .neon-checkbox__frame
+          .neon-checkbox__sparks
+          span {
+          animation: sparkFlash 0.6s ease-out forwards;
+        }
+
+        /* Animations */
+        @keyframes borderFlow1 {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(200%); }
+        }
+        @keyframes borderFlow2 {
+          0% { transform: translateY(0); }
+          100% { transform: translateY(200%); }
+        }
+        @keyframes borderFlow3 {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-200%); }
+        }
+        @keyframes borderFlow4 {
+          0% { transform: translateY(0); }
+          100% { transform: translateY(-200%); }
+        }
+        @keyframes particleExplosion {
+          0% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+          20% { opacity: 1; }
+          100% { transform: translate(calc(-50% + var(--x, 20px)), calc(-50% + var(--y, 20px))) scale(0); opacity: 0; }
+        }
+        @keyframes ringPulse {
+          0% { transform: scale(0); opacity: 1; }
+          100% { transform: scale(2); opacity: 0; }
+        }
+        @keyframes sparkFlash {
+          0% { transform: rotate(var(--r, 0deg)) translateX(0) scale(1); opacity: 1; }
+          100% { transform: rotate(var(--r, 0deg)) translateX(30px) scale(0); opacity: 0; }
+        }
+
+        /* Particle Positions */
+        .neon-checkbox__particles span:nth-child(1) { --x: 25px; --y: -25px; }
+        .neon-checkbox__particles span:nth-child(2) { --x: -25px; --y: -25px; }
+        .neon-checkbox__particles span:nth-child(3) { --x: 25px; --y: 25px; }
+        .neon-checkbox__particles span:nth-child(4) { --x: -25px; --y: 25px; }
+        .neon-checkbox__particles span:nth-child(5) { --x: 35px; --y: 0px; }
+        .neon-checkbox__particles span:nth-child(6) { --x: -35px; --y: 0px; }
+        .neon-checkbox__particles span:nth-child(7) { --x: 0px; --y: 35px; }
+        .neon-checkbox__particles span:nth-child(8) { --x: 0px; --y: -35px; }
+        .neon-checkbox__particles span:nth-child(9) { --x: 20px; --y: -30px; }
+        .neon-checkbox__particles span:nth-child(10) { --x: -20px; --y: 30px; }
+        .neon-checkbox__particles span:nth-child(11) { --x: 30px; --y: 20px; }
+        .neon-checkbox__particles span:nth-child(12) { --x: -30px; --y: -20px; }
+
+        /* Spark Rotations */
+        .neon-checkbox__sparks span:nth-child(1) { --r: 0deg; top: 50%; left: 50%; }
+        .neon-checkbox__sparks span:nth-child(2) { --r: 90deg; top: 50%; left: 50%; }
+        .neon-checkbox__sparks span:nth-child(3) { --r: 180deg; top: 50%; left: 50%; }
+        .neon-checkbox__sparks span:nth-child(4) { --r: 270deg; top: 50%; left: 50%; }
+
+        /* Ring Delays */
+        .neon-checkbox__rings .ring:nth-child(1) { animation-delay: 0s; }
+        .neon-checkbox__rings .ring:nth-child(2) { animation-delay: 0.1s; }
+        .neon-checkbox__rings .ring:nth-child(3) { animation-delay: 0.2s; }
       `}</style>
     </div>
   );
 };
 
-// ====================================================================
-// COMPONENTE PRINCIPAL
-// ====================================================================
 export default function LoginCorpoelec() {
   const [showSplash, setShowSplash] = useState(true);
 
